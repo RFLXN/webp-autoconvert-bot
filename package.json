@@ -1,0 +1,31 @@
+{
+  "name": "discord-webp-autoconvert",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint --fix src/**/*.ts",
+    "build": "tsc",
+    "prebuild": "yarpm run lint",
+    "start": "node --experimental-specifier-resolution=node ./dist/main.js",
+    "prestart": "yarpm run build"
+  },
+  "dependencies": {
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.0.3",
+    "node-fetch": "^3.3.1",
+    "sharp": "^0.32.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.1.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.2",
+    "@typescript-eslint/parser": "^5.59.2",
+    "eslint": "^8.40.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "typescript": "^5.0.4",
+    "yarpm": "^1.2.0"
+  }
+}
