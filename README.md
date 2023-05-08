@@ -1,3 +1,3 @@
 # WEBP to GIF Auto Convert Discord Bot
 
-`yarn run start` for run bot
+set discord bot token on `.env` file and `yarn run start` for run bot
