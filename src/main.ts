@@ -1,7 +1,9 @@
 import { AttachmentBuilder, Client, IntentsBitField } from "discord.js";
-import fetch from "node-fetch";
 import sharp from "sharp";
 import { config } from "dotenv";
+import fetchImage from "./fetch-image";
+import filterAnimated from "./filter-animated";
+import convertGif from "./convert-gif";
 
 config();
 
@@ -35,39 +37,27 @@ client.on("messageCreate", async (message) => {
         targetFileURLs.push(attachment.url);
     });
 
-    const fetchPromises = targetFileURLs.map(async (url) => {
-        const res = await fetch(url);
-        console.log(`WEBP fetched from ${url}`);
-        return res.arrayBuffer();
-    });
+    if (targetFileURLs.length < 1) {
+        return;
+    }
 
-    const fetchResults = await Promise.allSettled(fetchPromises);
+    const binaries = await fetchImage(targetFileURLs);
 
-    const gifs = fetchResults
-        .filter((result) => result.status == "fulfilled")
-        .map((result) => {
-            // rejected promise already filtered
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            const imageBuffer = result.value as ArrayBuffer;
-            const image = sharp(imageBuffer, { animated: true });
+    const sharps = binaries.map(
+        (binary) =>
+            sharp(binary, { animated: true }).withMetadata()
+    );
 
-            return image.withMetadata().gif();
-        });
+    const animatedGIFs = await filterAnimated(sharps);
 
-    const gifBufferPromises = gifs.map((gif) => gif.toBuffer());
+    if (animatedGIFs.length < 1) {
+        console.log("Animated WEBP not found. Skip converting...");
+        return;
+    }
 
-    const gifBufferResults = await Promise.allSettled(gifBufferPromises);
+    const convertedBinaries = await convertGif(animatedGIFs);
 
-    const gifBuffers = gifBufferResults
-        .filter((result) => result.status == "fulfilled")
-        .map((result) =>
-            // rejected promise already filtered
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            result.value as Buffer);
-
-    const builders = gifBuffers
+    const builders = convertedBinaries
         .map((buffer, index) => new AttachmentBuilder(buffer).setName(`image${index}.gif`));
 
     if (builders.length > 0) {
