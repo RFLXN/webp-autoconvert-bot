@@ -1,9 +1,9 @@
 import { AttachmentBuilder, Client, IntentsBitField } from "discord.js";
 import sharp from "sharp";
 import { config } from "dotenv";
-import fetchImage from "./fetch-image";
-import filterAnimated from "./filter-animated";
-import convertGif from "./convert-gif";
+import fetchImage from "./fetch-image.js";
+import filterAnimated from "./filter-animated.js";
+import convertGif from "./convert-gif.js";
 
 config();
 
